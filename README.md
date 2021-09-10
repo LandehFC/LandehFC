@@ -1,20 +1,45 @@
-## BUG-BOT
-<p align="center">
-<img src="https://github.com/XChillDs/hmm/blob/main/pfft.jpg" width="128" height="128"/>
-</p>
-<p align="center">
-<a href="#"><img title="BUG-BOT" src="https://img.shields.io/badge/Whatsapp Bot-green?colorA=%23ff0000&colorB=%23017e40&style=for-the-badge"></a>
-</p>
-<p align="center">
-<a href="https://github.com/XChillDs"><img title="Author" src="https://img.shields.io/badge/Author-XChillDs-red.svg?style=for-the-badge&logo=github"></a>
-</p>
+# ZipStream [![Build Status](https://travis-ci.org/archiverjs/node-zip-stream.svg?branch=master)](https://travis-ci.org/archiverjs/node-zip-stream) [![Build status](https://ci.appveyor.com/api/projects/status/2sraarbaadwbtti2/branch/master?svg=true)](https://ci.appveyor.com/project/ctalkington/node-zip-stream/branch/master)
 
-## nih node_modules nya kack
+zip-stream is a streaming zip archive generator based on the `ZipArchiveOutputStream` prototype found in the [compress-commons](https://www.npmjs.org/package/compress-commons) project.
 
+It was originally created to be a successor to [zipstream](https://npmjs.org/package/zipstream).
 
-* [`node_modules`](https://www.mediafire.com/file/pe6dsi1iwri8299/node_modules.zip) 
+Visit the [API documentation](http://archiverjs.com/zip-stream) for a list of all methods available.
 
+### Install
 
-## Special Thanks to
-* [`Baileys`](https://github.com/adiwajshing/Baileys)
-* [`MhankBarBar`](https://github.coMhankBarBar)
+```bash
+npm install zip-stream --save
+```
+
+You can also use `npm install https://github.com/archiverjs/node-zip-stream/archive/master.tar.gz` to test upcoming versions.
+
+### Usage
+
+This module is meant to be wrapped internally by other modules and therefore lacks any queue management. This means you have to wait until the previous entry has been fully consumed to add another. Nested callbacks should be used to add multiple entries. There are modules like [async](https://npmjs.org/package/async) that ease the so called "callback hell".
+
+If you want a module that handles entry queueing and much more, you should check out [archiver](https://npmjs.org/package/archiver) which uses this module internally.
+
+```js
+var packer = require('zip-stream');
+var archive = new packer(); // OR new packer(options)
+
+archive.on('error', function(err) {
+  throw err;
+});
+
+// pipe archive where you want it (ie fs, http, etc)
+// listen to the destination's end, close, or finish event
+
+archive.entry('string contents', { name: 'string.txt' }, function(err, entry) {
+  if (err) throw err;
+  archive.entry(null, { name: 'directory/' }, function(err, entry) {
+    if (err) throw err;
+    archive.finish();
+  });
+});
+```
+
+## Credits
+
+Concept inspired by Antoine van Wel's [zipstream](https://npmjs.org/package/zipstream) module, which is no longer being updated.
